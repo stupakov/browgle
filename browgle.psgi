@@ -4,7 +4,7 @@ use Tatsumaki::Error;
 use Tatsumaki::Application;
 use Time::HiRes;
 
-package ChatPollHandler;
+package PollHandler;
 use base qw(Tatsumaki::Handler);
 __PACKAGE__->asynchronous(1);
 
@@ -25,7 +25,7 @@ sub on_new_event {
     $self->finish;
 }
 
-package ChatMultipartPollHandler;
+package MultipartPollHandler;
 use base qw(Tatsumaki::Handler);
 __PACKAGE__->asynchronous(1);
 
@@ -45,7 +45,7 @@ sub get {
     });
 }
 
-package ChatPostHandler;
+package PostHandler;
 use base qw(Tatsumaki::Handler);
 use HTML::Entities;
 use Encode;
@@ -73,26 +73,26 @@ sub format_message {
     $text;
 }
 
-package ChatRoomHandler;
+package GetHandler;
 use base qw(Tatsumaki::Handler);
 
 sub get {
     my($self, $channel) = @_;
-    $self->render('chat.html');
+    $self->render('browgle.html');
 }
 
 package main;
 use File::Basename;
 
-my $chat_re = '[\w\.\-]+';
 my $app = Tatsumaki::Application->new([
-    "/chat/($chat_re)/poll" => 'ChatPollHandler',
-    "/chat/($chat_re)/mxhrpoll" => 'ChatMultipartPollHandler',
-    "/chat/($chat_re)/post" => 'ChatPostHandler',
-    "/chat/($chat_re)" => 'ChatRoomHandler',
+    "/poll" => 'PollHandler',
+    "/mxhrpoll" => 'MultipartPollHandler',
+    "/post" => 'PostHandler',
+    "/" => 'GetHandler',
 ]);
 
-$app->template_path(dirname(__FILE__) . "/templates");
+# $app->template_path(dirname(__FILE__) . "/templates");
+$app->template_path(dirname(__FILE__));
 $app->static_path(dirname(__FILE__) . "/static");
 
 return $app;
