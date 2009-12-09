@@ -91,7 +91,7 @@ my $app = Tatsumaki::Application->new([
     "/" => 'GetHandler',
 ]);
 
-# $app->template_path(dirname(__FILE__) . "/templates");
+# $app->template_path(dirname(__FILE__) . "/template");
 $app->template_path(dirname(__FILE__));
 $app->static_path(dirname(__FILE__) . "/static");
 

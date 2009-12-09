@@ -1,52 +1,56 @@
-jQuery(function(){ setup() });
+(Browgle = function(){}).prototype = {
 
-function setup() {
-    $('table#playfield td')
-        .each( function(){this.innerHTML = "&nbsp;"} )
-        .height(50);
+    setup: function() {
+        $('table#playfield td')
+            .each( function(){this.innerHTML = "&nbsp;"} )
+            .height(50);
 
-    var ident = $.cookie('ident');
-    if ( !ident ) {
-        getIdentity();
-    }
-    else {
-        postIdentity(ident);
-    }
-}
+        var ident = $.cookie('ident');
+        if ( !ident ) {
+            this.getIdentity();
+        }
+        else {
+            this.postIdentity(ident);
+        }
+    },
 
-function postIdentity(ident) {
-    showIdentity(ident);
-}
+    postIdentity: function(ident) {
+        this.showIdentity(ident);
+    },
 
-function showIdentity(ident) {
-    $('#user-list-div').show();
-    $('table#user-list-table tr')
-        .each(function() {
-            $(this).append('<td></td>');
-        });
-    $('table#user-list-table tr:eq(0) td:last').get(0).innerHTML = ident;
-}
+    showIdentity: function(ident) {
+        $('#user-list-div').show();
+        $('table#user-list-table tr')
+            .each(function() {
+                $(this).append('<td></td>');
+            });
+        $('table#user-list-table tr:eq(0) td:last').get(0).innerHTML = ident;
+    },
 
-function getIdentity() {
-    $('#signin-div').show();
-    $('input#ident')
-        .val('')
-        .focus()
-        .blur(
-            function() {
-                var ident = this.value;
-                if (ident.match(/[\w\.]+@[\w\.]+/)) {
-                    $.cookie('ident', ident);
-                    $('#signin-div').hide();
-                    addUser(ident);
+    getIdentity: function() {
+        $('#signin-div').show();
+        $('input#ident')
+            .val('')
+            .focus()
+            .blur(
+                function() {
+                    var ident = this.value;
+                    if (ident.match(/[\w\.]+@[\w\.]+/)) {
+                        $.cookie('ident', ident);
+                        $('#signin-div').hide();
+                        addUser(ident);
+                    }
                 }
-            }
-        )
-}
+            )
+    },
 
-function addUser(ident) {
-    $('#user-list-div').show();
-}
+    addUser: function(ident) {
+        $('#user-list-div').show();
+    },
+
+};
+
+/******************************************** Old Code
 
 var cookieName = 'tatsumaki_chat_ident';
 function doPost(el1, el) {
@@ -112,4 +116,4 @@ function oldCode() {
     $('#ident').attr('value', $.cookie(cookieName));
 
   window.setInterval(function(){ $(".pretty-time").prettyDate() }, 1000 * 30);
-}
+  */
