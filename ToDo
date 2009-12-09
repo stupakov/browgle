@@ -1,0 +1,5 @@
+- Add appropriate COPYRIGHT statements
+- Send events to server
+- Handle events coming back from server
+- Add Start button
+- Roll the dice onto the board
