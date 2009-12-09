@@ -24,6 +24,22 @@
   color: #888;
   font-size: 0.8em;
 }
+.leftdiv {
+    float: left;
+    width: 500px;
+}
+.rightdiv {
+    float: left;
+    width: 500px;
+}
+.user-list {
+    float: right;
+    width: 500px;
+}
+.bodydiv {
+    min-width: 1000px;
+}
+
 body {
   margin: 1em 2em
 }
@@ -31,8 +47,15 @@ body {
 table#playfield {
     border-collapse:collapse;
 }
-
 table#playfield td{
     border: solid black 2px;
+    width: 50px;
+}
+table#user-list-table {
+    border-collapse:collapse;
+}
+
+table#user-list-table td{
+    /*border: solid black 1px;*/
     width: 50px;
 }

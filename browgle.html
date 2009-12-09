@@ -12,44 +12,68 @@
 
 </head>
 <body>
-<h1 class="title">Browgle</h1>
-<!-- move this input out of form so Firefox can submit with enter key :/ -->
+<div class="bodydiv">
+<div class="leftdiv">
 
-<div id="signin">
-    Enter your email address (for Gravatar): <input id="ident" type="text" name="ident" size="24"/>
+    <h1 class="title">Browgle</h1>
 
+    <table id="playfield">
+    <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    </tr>
+    <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    </tr>
+    <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    </tr>
+    <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    </tr>
+
+    </table>
+    <p/>
 </div>
 
-<table id="playfield">
-<tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
 
-</table>
-<p/>
+<div class="rightdiv">
+    <div id="signin-div" style="display:none;">
+        <h1>Sign in to play:</h1>
+        Enter your email address (for Gravatar): 
+        <br/>
+        <input id="ident" type="text" name="ident" size="24"/>
+        <p/>
+    </div>
+
+
+    <div id="user-list-div" class="user-list" style="display:none;">
+    <h1>Players</h1>
+    <table id="user-list-table">
+        <tr><td>Name:</td></tr>
+        <tr><td>Words:</td></tr>
+        <tr><td></td></tr>
+        <tr><td></td></tr>
+    </table>
+    </div>
+</div>
+
+<div style="clear:both;">
+</div>
 
 <div id="footer">Powered by <a href="http://github.com/miyagawa/Tatsumaki">Tatsumaki/0.1004</a>.</div>
 
+</div>
 </body>
 </html>
