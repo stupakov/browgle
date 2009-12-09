@@ -1,51 +1,90 @@
 (Browgle = function(){}).prototype = {
 
+    dice: [
+        ['A', 'A', 'C', 'I', 'O', 'T'],
+        ['A', 'B', 'I', 'L', 'T', 'Y'],
+        ['A', 'B', 'J', 'M', 'O', 'Qu'],
+        ['A', 'C', 'D', 'E', 'M', 'P'],
+        ['A', 'C', 'E', 'L', 'R', 'S'],
+        ['A', 'D', 'E', 'N', 'V', 'Z'],
+        ['A', 'H', 'M', 'O', 'R', 'S'],
+        ['B', 'F', 'I', 'O', 'R', 'X'],
+        ['D', 'E', 'N', 'S', 'O', 'W'],
+        ['D', 'K', 'N', 'O', 'U', 'T'],
+        ['E', 'E', 'F', 'H', 'I', 'Y'],
+        ['E', 'G', 'I', 'N', 'T', 'V'],
+        ['E', 'G', 'K', 'L', 'U', 'Y'],
+        ['E', 'H', 'I', 'N', 'P', 'S'],
+        ['E', 'L', 'P', 'S', 'T', 'U'],
+        ['G', 'I', 'L', 'R', 'U', 'W']
+    ],
+
     setup: function() {
-        $('table#playfield td')
+
+        $('table.game_board td')
             .each( function(){this.innerHTML = "&nbsp;"} )
             .height(50);
 
-        var ident = $.cookie('ident');
-        if ( !ident ) {
+        var id = $.cookie('user_id');
+        if ( !id ) {
             this.getIdentity();
         }
         else {
-            this.postIdentity(ident);
+            this.postIdentity(id);
         }
     },
 
-    postIdentity: function(ident) {
-        this.showIdentity(ident);
+    postIdentity: function(id) {
+        this.showIdentity(id);
     },
 
-    showIdentity: function(ident) {
-        $('#user-list-div').show();
-        $('table#user-list-table tr')
+    showIdentity: function(id) {
+        var self = this;
+        $('.user_list_pane').show();
+        $('table.user_list tr')
             .each(function() {
                 $(this).append('<td></td>');
             });
-        $('table#user-list-table tr:eq(0) td:last').get(0).innerHTML = ident;
+        $('table.user_list tr').eq(0).find('td:last').get(0).innerHTML =
+            '<a href="#">' + id + '</a>';
+        $('table.user_list a')
+            .click(
+                function() {
+                    $.cookie('user_id', null);
+                    $('.user_list_pane').hide();
+                    self.getIdentity();
+                }
+            );
     },
 
     getIdentity: function() {
-        $('#signin-div').show();
-        $('input#ident')
+        var self = this;
+        $('.signin_pane').show();
+        $('input.user_id')
             .val('')
-            .focus()
-            .blur(
+            .focus();
+        $('form.user_id')
+            .submit(
                 function() {
-                    var ident = this.value;
-                    if (ident.match(/[\w\.]+@[\w\.]+/)) {
-                        $.cookie('ident', ident);
-                        $('#signin-div').hide();
-                        addUser(ident);
+                    var id = $(this).find('input').val();
+                    if (id.match(/[\w\.]+@[\w\.]+/)) {
+                        $.cookie('user_id', id);
+                        $('.signin_pane').hide();
+                        self.addUser(id);
+                        self.showIdentity(id);
                     }
+                    else {
+                        $('div.user_id_error').text(
+                            "'" + id + "' is an invalid email address"
+                        );
+                    }
+                    return false;
                 }
-            )
+            );
     },
 
-    addUser: function(ident) {
-        $('#user-list-div').show();
+    addUser: function(id) {
+        $('.user_list_pane').show();
     },
 
 };

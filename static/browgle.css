@@ -1,61 +1,55 @@
+body {
+    margin: 1em 2em;
+    font-family: sans-serif;
+}
 
-#messages {
-  margin-top: 1em;
-  margin-right: 3em;
-  width: 100%;
+table.game_board {
+    border-collapse:collapse;
 }
-.avatar {
-  width: 25px;
-  vertical-align: top;
+
+table.game_board td{
+    border: solid black 2px;
+    width: 50px;
+    font-family: courier;
+    font-size: 300%;
+    text-align: center;
 }
-.avatar img {
-  width: 25px; height: 25px;
-  vertical-align: top;
-  margin-right: 0.5em;
+
+table.user_list {
+    border-collapse:collapse;
 }
-.chat-message {
-  width: 70%;
+
+table.user_list td{
+    width: 50px;
 }
-.chat-message .name {
-  font-weight: bold;
-}
-.meta {
-  vertical-align: top;
-  color: #888;
-  font-size: 0.8em;
-}
-.leftdiv {
+
+.left_column {
     float: left;
-    width: 500px;
+    margin-right: 50px;
 }
-.rightdiv {
+
+.right_column {
     float: left;
-    width: 500px;
 }
-.user-list {
-    float: right;
-    width: 500px;
+
+.footer {
+    clear: both;
+    width: 100%;
+    text-align: center;
 }
-.bodydiv {
+
+.signin_pane, .user_list_pane {
+    display: none;
+}
+
+.user_list {
+    /*float: right;*/
+}
+
+.canvas {
     min-width: 1000px;
 }
 
-body {
-  margin: 1em 2em
-}
-
-table#playfield {
-    border-collapse:collapse;
-}
-table#playfield td{
-    border: solid black 2px;
-    width: 50px;
-}
-table#user-list-table {
-    border-collapse:collapse;
-}
-
-table#user-list-table td{
-    /*border: solid black 1px;*/
-    width: 50px;
+.user_id_error {
+    color: red;
 }
