@@ -7,9 +7,8 @@ table.game_board {
     border-collapse:collapse;
 }
 
-table.game_board td{
+table.game_board td {
     border: solid black 2px;
-    width: 50px;
     font-family: courier;
     font-size: 300%;
     text-align: center;
@@ -17,6 +16,10 @@ table.game_board td{
 
 table.user_list {
     border-collapse:collapse;
+}
+table.user_list td {
+    border: solid black 1px;
+    padding: 2px 4px;
 }
 
 table.user_list td{

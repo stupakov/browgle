@@ -1,5 +1,9 @@
-- Add appropriate COPYRIGHT statements
++ Roll the dice onto the board
+
+- Hide board if not signed in
 - Send events to server
 - Handle events coming back from server
-- Add Start button
-- Roll the dice onto the board
+- Add appropriate COPYRIGHT statements
+- Keep users in the object
+- Add Start button if users is >= 2
+- Put gravatar in the user list
