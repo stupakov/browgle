@@ -1,7 +1,11 @@
 (Browgle = function(){}).prototype = {
 
+
+    // add user to users [] and   user-client mapping 
     user_id: null,
     client_id: String(Math.random()),
+    users: [],
+    userClients: {},
     // current_users: [],
 
     getDice: function() {
@@ -140,6 +144,11 @@
 
     handle_add_user: function(event) {
         var id = event.user_id;
+        this.users.push({
+            user_id: event.user_id,
+            client_id: event.client_id,
+        });
+       
         $('table.user_list tr')
             .each(function() {
                 $(this).append('<td></td>');
@@ -154,17 +163,26 @@
             .find('td:last').get(0).innerHTML = html;
     },
 
-    handle_remove_user: function(event) {
-        var id = event.user_id;
+    getUserNumber: function(client_id) {
+        for (var i = 0; i < this.users.length; i++) {
+            if(this.users[i].client_id == client_id) {
+                return i + 1;
+            }
+        }
+        console.log( client_id, this.users);
+        return 0;
+        //throw("Can't find client_id == " + client_id);
+    },
 
-        $('table.user_list tr:first td img')
-            .each(function(i) {
-                if ($(this).attr('alt') == id) {
-                    $('table.user_list tr')
-                        .find('td:eq(' + (i + 1) + ')')
-                        .remove();
-                }
-            });
+    handle_remove_user: function(event) {
+        var ii = this.getUserNumber(event.client_id);
+        if (!ii) return;
+
+        this.users.splice(ii - 1, 1);
+
+        $('table.user_list tr')
+            .find('td:eq(' + (ii) + ')')
+            .remove();
     },
 
     'The': 'End'
