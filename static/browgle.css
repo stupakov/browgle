@@ -39,9 +39,10 @@ table.user_list td{
     clear: both;
     width: 100%;
     text-align: center;
+    margin: 50px;
 }
 
-.signin_pane, .user_list_pane {
+.signin_screen, .game_screen {
     display: none;
 }
 
@@ -53,6 +54,6 @@ table.user_list td{
     min-width: 1000px;
 }
 
-.user_id_error {
+.signin_error {
     color: red;
 }

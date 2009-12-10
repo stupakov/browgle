@@ -4,15 +4,32 @@ use Tatsumaki::Error;
 use Tatsumaki::Application;
 use Time::HiRes;
 
+package MessageQueue;
+use base qw(Tatsumaki::MessageQueue);
+
+sub append_backlog {
+    my($self, @events) = @_;
+    my @new_backlog = @{$self->backlog};
+    for my $event (@events) {
+        if ($event->{event} eq 'remove_client') {
+            @new_backlog = grep {
+                $_->{client_id} ne $event->{client_id}
+            } @new_backlog;
+        }
+        else {
+            unshift @new_backlog, $event;
+        }
+    }
+    $self->backlog(\@new_backlog);
+}
+
 package PollHandler;
 use base qw(Tatsumaki::Handler);
 __PACKAGE__->asynchronous(1);
 
-use Tatsumaki::MessageQueue;
-
 sub get {
-    my($self, $channel) = @_;
-    my $mq = Tatsumaki::MessageQueue->instance($channel);
+    my ($self) = @_;
+    my $mq = MessageQueue->instance('Browgle');
     my $client_id = $self->request->param('client_id')
         or Tatsumaki::Error::HTTP->throw(500, "'client_id' needed");
     $client_id = rand(1) if $client_id eq 'dummy'; # for benchmarking stuff
@@ -20,64 +37,29 @@ sub get {
 }
 
 sub on_new_event {
-    my($self, @events) = @_;
+    my ($self, @events) = @_;
     $self->write(\@events);
     $self->finish;
 }
 
-package MultipartPollHandler;
-use base qw(Tatsumaki::Handler);
-__PACKAGE__->asynchronous(1);
-
-sub get {
-    my($self, $channel) = @_;
-
-    my $client_id = $self->request->param('client_id') || rand(1);
-
-    $self->multipart_xhr_push(1);
-
-    my $mq = Tatsumaki::MessageQueue->instance($channel);
-    $mq->poll($client_id, sub {
-        my @events = @_;
-        for my $event (@events) {
-            $self->stream_write($event);
-        }
-    });
-}
-
 package PostHandler;
 use base qw(Tatsumaki::Handler);
-use HTML::Entities;
-use Encode;
-
 sub post {
-    my($self, $channel) = @_;
+    my ($self) = @_;
 
     my $v = $self->request->params;
-    my $html = $self->format_message($v->{text});
-    my $mq = Tatsumaki::MessageQueue->instance($channel);
-    $mq->publish({
-        type => "message", html => $html, ident => $v->{ident},
-        avatar => $v->{avatar}, name => $v->{name},
-        address => $self->request->address,
-        time => scalar Time::HiRes::gettimeofday,
-    });
+    $v->{time} = scalar Time::HiRes::gettimeofday;
+    $v->{address} = $self->request->address;
+    my $mq = MessageQueue->instance('Browgle');
+    $mq->publish($v);
     $self->write({ success => 1 });
-}
-
-sub format_message {
-    my($self, $text) = @_;
-    $text =~ s{ (https?://\S+) | ([&<>"']+) }
-              { $1 ? do { my $url = HTML::Entities::encode($1); qq(<a target="_blank" href="$url">$url</a>) } :
-                $2 ? HTML::Entities::encode($2) : '' }egx;
-    $text;
 }
 
 package GetHandler;
 use base qw(Tatsumaki::Handler);
 
 sub get {
-    my($self, $channel) = @_;
+    my ($self) = @_;
     $self->render('browgle.html');
 }
 
@@ -86,7 +68,6 @@ use File::Basename;
 
 my $app = Tatsumaki::Application->new([
     "/poll" => 'PollHandler',
-    "/mxhrpoll" => 'MultipartPollHandler',
     "/post" => 'PostHandler',
     "/" => 'GetHandler',
 ]);

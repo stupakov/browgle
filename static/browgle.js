@@ -1,6 +1,8 @@
 (Browgle = function(){}).prototype = {
 
-    currentUsers: [],
+    user_id: null,
+    client_id: String(Math.random()),
+    // current_users: [],
 
     getDice: function() {
         return [
@@ -23,66 +25,57 @@
         ];
     },
 
-    setup: function() {
-        this.xxxHooks();
+    // This function gets called when the page is first loaded. It should only
+    // be called once. It sets up the game.
+    init: function() {
+        var self = this;
 
         $('table.game_board td')
-            .each( function(){this.innerHTML = "&nbsp;"} )
             .height(50)
             .width(50);
 
-        var id = $.cookie('user_id');
-        if ( !id ) {
-            this.getIdentity();
+        this.debugHooks(); // XXX
+
+        this.startLongPoll();
+
+        $('.game_screen').hide();
+        $('.signin_screen').show();
+        this.setupSigninScreen();
+
+        onunload = function() {
+            self.postEvent({event: 'remove_user'});
+            self.postEvent({event: 'remove_client'});
+            return false;
         }
-        else {
-            this.postIdentity(id);
-        }
     },
 
-    postIdentity: function(id) {
-        this.showIdentity(id);
-    },
-
-    showIdentity: function(id) {
-        $('.user_list_pane').show();
-        $('table.user_list tr')
-            .each(function() {
-                $(this).append('<td></td>');
-            });
-        $('table.user_list tr').eq(0).find('td:last').get(0).innerHTML =
-            '<b>' + id + '</b>';
-    },
-
-    getIdentity: function() {
+    setupSigninScreen: function() {
         var self = this;
-        $('.signin_pane').show();
         $('input.user_id')
             .val('')
             .focus();
-        $('form.user_id')
+        $('form.signin')
             .unbind('submit')
             .submit(
                 function() {
-                    var id = $(this).find('input').val();
-                    if (id.match(/^[\w\.\-]+@[\w\.\-]+\.\w{2,4}$/)) {
-                        $.cookie('user_id', id);
-                        $('.signin_pane').hide();
-                        self.addUser(id);
-                        self.showIdentity(id);
+                    try {
+                        var id = $(this).find('input').val();
+                        if (id.match(/^[\w\.\-]+@[\w\.\-]+\.\w{2,4}$/)) {
+                            self.user_id = id;
+                            self.postEvent({event: 'add_user'});
+                            $('.signin_screen').hide();
+                            $('.game_screen').show();
+                        }
+                        else {
+                            $('div.signin_error').text(
+                                "'" + id + "' is an invalid email address"
+                            );
+                        }
                     }
-                    else {
-                        $('div.user_id_error').text(
-                            "'" + id + "' is an invalid email address"
-                        );
-                    }
+                    catch(e) {}
                     return false;
                 }
             );
-    },
-
-    addUser: function(id) {
-        $('.user_list_pane').show();
     },
 
     rollDice: function() {
@@ -101,23 +94,12 @@
     },
 
     signOff: function() {
-        var id = $.cookie('user_id');
+        window.location.reload(); 
 
-        $('table.user_list tr:first td')
-            .each(function(i) {
-                if (this.textContent == id) {
-                    $('table.user_list tr')
-                        .find('td:eq(' + i + ')')
-                        .remove();
-                }
-            });
-                    
-        $.cookie('user_id', null);
-        $('.user_list_pane').hide();
-        this.getIdentity();
     },
 
-    xxxHooks: function() {
+    // XXX
+    debugHooks: function() {
         var self = this;
 
         $('.roll_dice').click(function() {
@@ -129,6 +111,60 @@
             self.signOff();
             return false;
         });
+    },
+
+    postEvent: function(event) {
+        event.user_id = this.user_id;
+        event.client_id = this.client_id;
+        event.type = 'event';
+        $.ajax({
+            url: "/post",
+            data: event,
+            type: 'post',
+            dataType: 'json',
+            success: function(r) { }
+        });
+    },
+
+    startLongPoll: function() {
+        var self = this;
+        $.ev.handlers.event = function(event) {
+            console.log(event['event'], event.client_id);
+            var handler = self['handle_' + event['event']];
+            if (handler) {
+                handler.call(self, event);
+            }
+        };
+        $.ev.loop('/poll?client_id=' + this.client_id);
+    },
+
+    handle_add_user: function(event) {
+        var id = event.user_id;
+        $('table.user_list tr')
+            .each(function() {
+                $(this).append('<td></td>');
+            });
+        var url = "http://www.gravatar.com/avatar/" + $.md5(id);
+        var html =
+            '<img src="' + url +
+            '" alt="' + id +
+            '" title="' + id +
+            '" />';
+        $('table.user_list tr').eq(0)
+            .find('td:last').get(0).innerHTML = html;
+    },
+
+    handle_remove_user: function(event) {
+        var id = event.user_id;
+
+        $('table.user_list tr:first td img')
+            .each(function(i) {
+                if ($(this).attr('alt') == id) {
+                    $('table.user_list tr')
+                        .find('td:eq(' + (i + 1) + ')')
+                        .remove();
+                }
+            });
     },
 
     'The': 'End'
