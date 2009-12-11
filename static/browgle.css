@@ -42,8 +42,13 @@ table.user_list td{
     margin: 50px;
 }
 
-.signin_screen, .game_screen {
+.signin_screen, .game_screen, .word_input, .game_begin {
     display: none;
+}
+
+.word_input input {
+    font-size: 200%;
+    width: 200px;
 }
 
 .user_list {

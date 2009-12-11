@@ -44,6 +44,14 @@
 
         $('.game_screen').hide();
         $('.signin_screen').show();
+        setTimeout(function() {
+            $('.signin_screen input').focus();
+        }, 200);
+        $('.game_begin input')
+            .click(function() {
+                self.postEvent({event: 'start_game'});
+                return false;
+            });
         this.setupSigninScreen();
 
         onunload = function() {
@@ -82,15 +90,26 @@
             );
     },
 
+    handle_dice_roll: function(event) {
+        var roll = event.roll;
+        var $slots = $('table.game_board td');
+        for (var i = 0, l = roll.length; i < l; i++) {
+            $slots[i].textContent = roll[i];
+        }
+    },
     rollDice: function() {
         dice = this.getDice();
-        var $slots = $('table.game_board td');
+        roll = '';
         for (var i = 16; i > 0; i--) {
             var ii = parseInt(Math.random() * i);
             var die = dice.splice(ii, 1)[0];
             var iii = parseInt(Math.random() * 6);
-            $slots[i - 1].textContent = die[iii];
+            roll += String(die[iii]);
         }
+        this.postEvent({
+            event: 'dice_roll',
+            'roll': roll
+        });
     },
 
     checkWord: function(word) {
@@ -133,7 +152,7 @@
     startLongPoll: function() {
         var self = this;
         $.ev.handlers.event = function(event) {
-            console.log(event['event'], event.client_id);
+            console.log(event['event'], event.client_id, event);
             var handler = self['handle_' + event['event']];
             if (handler) {
                 handler.call(self, event);
@@ -161,6 +180,10 @@
             '" />';
         $('table.user_list tr').eq(0)
             .find('td:last').get(0).innerHTML = html;
+    
+        if( this.users.length >= 2 ) {
+            $('.game_begin').show();
+        }
     },
 
     getUserNumber: function(client_id) {
@@ -183,6 +206,24 @@
         $('table.user_list tr')
             .find('td:eq(' + (ii) + ')')
             .remove();
+
+        if( this.users.length < 2 ) {
+            $('.game_begin').hide();
+        }
+
+    },
+
+    handle_start_game: function(event) {
+        $('.game_begin').hide();
+        $('.game_title').hide();
+        $('.word_input').show();
+        this.rollDice();
+
+
+        setTimeout(function() {
+            $('.word_input input').focus();
+        }, 1000);
+        
     },
 
     'The': 'End'
