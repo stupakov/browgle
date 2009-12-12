@@ -13,8 +13,6 @@
     user_id: null,
     client_id: String(Math.random()),
     users: [],
-    userClients: {},
-    // current_users: [],
 
     getDice: function() {
         return [
@@ -62,11 +60,23 @@
             });
         this.setupSigninScreen();
 
+        setTimeout(function() {
+            self.postEvent({
+                event: 'foo',
+                array: [1,2,3,4],
+                object: {a: 1, b: 2}
+            });
+        }, 1000);
+
         onunload = function() {
             self.postEvent({event: 'remove_user'});
             self.postEvent({event: 'remove_client'});
             return false;
         }
+    },
+
+    handle_foo: function(event) {
+        XXX = event;
     },
 
     setupSigninScreen: function() {
