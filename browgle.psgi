@@ -9,18 +9,7 @@ use base qw(Tatsumaki::MessageQueue);
 
 sub append_backlog {
     my($self, @events) = @_;
-    my @new_backlog = @{$self->backlog};
-    for my $event (@events) {
-        if ($event->{event} eq 'remove_client') {
-            @new_backlog = grep {
-                $_->{client_id} ne $event->{client_id}
-            } @new_backlog;
-        }
-        else {
-            unshift @new_backlog, $event;
-        }
-    }
-    $self->backlog(\@new_backlog);
+    $self->backlog([]);
 }
 
 package PollHandler;
