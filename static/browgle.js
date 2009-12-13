@@ -1,3 +1,11 @@
+/*
+ * Browgle - A browser-based, multi-user B*ggle game.
+ * 
+ * Copyright (c) 2009 Alex Stupakov <stupakov@gmail.com>, Ingy döt Net <ingy@ingy.net>
+ * Licensed under the MIT License.
+ * See the License file.
+ */
+
 (Browgle = function(){}).prototype = {
 
 

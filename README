@@ -1,13 +1,17 @@
-Browgle is a Browser based, multiuser B*ggle game.
+Browgle - A browser-based, multi-user B*ggle game.
 
 SETUP
 =====
 
 To run it, you'll need to install http://github.com/miyagawa/Tatsumaki.
 
-     sudo cpan Tatsumaki
+    sudo cpan Tatsumaki
 
 is the best way to do that. Then run:
+
+    make all
+
+to get the rest of the dependencies. Finally run:
 
     ./browgle
 
@@ -17,7 +21,6 @@ people to go to the URL, and have fun!
 COPYRIGHT
 =========
 
-Copyright 2009
-
-Ingy döt Net <ingy@ingy.net>
-Alex Stupakov <stupakov@gmail.com>
+Copyright (c) 2009 Alex Stupakov <stupakov@gmail.com>, Ingy döt Net <ingy@ingy.net>
+Licensed under the MIT License.
+See the License file.
