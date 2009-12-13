@@ -6,13 +6,19 @@
  * See the License file.
  */
 
+function XXX() { console.log.apply(this, arguments) }
+
 (Browgle = function(){}).prototype = {
 
 
     // add user to users [] and   user-client mapping 
+    setup: false,
+    busy: false,
     user_id: null,
     client_id: String(Math.random()),
-    users: [],
+    state: {
+        users: []
+    },
 
     getDice: function() {
         return [
@@ -38,49 +44,26 @@
     // This function gets called when the page is first loaded. It should only
     // be called once. It sets up the game.
     init: function() {
-        var self = this;
-
         $('table.game_board td')
             .height(50)
             .width(50);
 
-        this.debugHooks(); // XXX
-
         this.startLongPoll();
+
+        this.showSigninScreen();
+
+        this.addEventHandlers();
+    },
+
+    showSigninScreen: function() {
+        var self = this;
 
         $('.game_screen').hide();
         $('.signin_screen').show();
         setTimeout(function() {
             $('.signin_screen input').focus();
-        }, 200);
-        $('.game_begin input')
-            .click(function() {
-                self.postEvent({event: 'start_game'});
-                return false;
-            });
-        this.setupSigninScreen();
+        }, 500);
 
-        setTimeout(function() {
-            self.postEvent({
-                event: 'foo',
-                array: [1,2,3,4],
-                object: {a: 1, b: 2}
-            });
-        }, 1000);
-
-        onunload = function() {
-            self.postEvent({event: 'remove_user'});
-            self.postEvent({event: 'remove_client'});
-            return false;
-        }
-    },
-
-    handle_foo: function(event) {
-        XXX = event;
-    },
-
-    setupSigninScreen: function() {
-        var self = this;
         $('input.user_id')
             .val('')
             .focus();
@@ -92,9 +75,10 @@
                         var id = $(this).find('input').val();
                         if (id.match(/^[\w\.\-]+@[\w\.\-]+\.\w{2,4}$/)) {
                             self.user_id = id;
-                            self.postEvent({event: 'add_user'});
+                            self.postEvent({event: 'request_state'});
                             $('.signin_screen').hide();
                             $('.game_screen').show();
+                            setTimeout(function() { self.setupFirstUser() }, 1000);
                         }
                         else {
                             $('div.signin_error').text(
@@ -106,6 +90,14 @@
                     return false;
                 }
             );
+    },
+
+    setupFirstUser: function() {
+        if (this.setup) return;
+
+        this.addUser(this.user_id, this.client_id);
+
+        this.setup = true;
     },
 
     handle_dice_roll: function(event) {
@@ -139,9 +131,14 @@
 
     },
 
-    // XXX
-    debugHooks: function() {
+    addEventHandlers: function() {
         var self = this;
+
+        $('.game_begin input')
+            .click(function() {
+                self.postEvent({event: 'start_game'});
+                return false;
+            });
 
         $('.roll_dice').click(function() {
             self.rollDice();
@@ -152,9 +149,67 @@
             self.signOff();
             return false;
         });
+
+        onunload = function() {
+            if (self.setup) {
+                self.postEvent({event: 'remove_user'});
+            }
+            return false;
+        }
     },
 
+    addUser: function(user_id, client_id) {
+        this.state.users.push({
+            user_id: user_id,
+            client_id: client_id,
+        });
+       
+        $('table.user_list tr')
+            .each(function() {
+                $(this).append('<td></td>');
+            });
+        var url = "http://www.gravatar.com/avatar/" + $.md5(user_id);
+        var html =
+            '<img src="' + url +
+            '" alt="' + user_id +
+            '" title="' + user_id +
+            '" />';
+        $('table.user_list tr').eq(0)
+            .find('td:last').get(0).innerHTML = html;
+    
+        if (this.state.users.length >= 2) {
+            $('.game_begin').show();
+        }
+    },
+
+    removeUser: function(client_id) {
+        var ii = this.getUserNumber(client_id);
+        if (!ii) return;
+
+        this.state.users.splice(ii - 1, 1);
+
+        $('table.user_list tr')
+            .find('td:eq(' + (ii) + ')')
+            .remove();
+
+        if( this.state.users.length < 2 ) {
+            $('.game_begin').hide();
+        }
+
+    },
+
+    getUserNumber: function(client_id) {
+        for (var i = 0, l = this.state.users.length; i < l; i++) {
+            if (this.state.users[i].client_id == client_id) {
+                return i + 1;
+            }
+        }
+        return 0;
+    },
+
+// Server communication
     postEvent: function(event) {
+        XXX('Posting event: ' + event.event);
         event.user_id = this.user_id;
         event.client_id = this.client_id;
         event.type = 'event';
@@ -170,7 +225,7 @@
     startLongPoll: function() {
         var self = this;
         $.ev.handlers.event = function(event) {
-            console.log(event['event'], event.client_id, event);
+            XXX(event['event'], event.client_id, event);
             var handler = self['handle_' + event['event']];
             if (handler) {
                 handler.call(self, event);
@@ -179,56 +234,37 @@
         $.ev.loop('/poll?client_id=' + this.client_id);
     },
 
-    handle_add_user: function(event) {
-        var id = event.user_id;
-        this.users.push({
-            user_id: event.user_id,
-            client_id: event.client_id,
-        });
-       
-        $('table.user_list tr')
-            .each(function() {
-                $(this).append('<td></td>');
+// Message handlers
+    handle_request_state: function(event) {
+        if (this.setup &&
+            this.state.users[0].client_id == this.client_id
+        ) {
+            this.postEvent({
+                event: 'current_state',
+                state: $.toJSON(this.state),
+                for_client: event.client_id
             });
-        var url = "http://www.gravatar.com/avatar/" + $.md5(id);
-        var html =
-            '<img src="' + url +
-            '" alt="' + id +
-            '" title="' + id +
-            '" />';
-        $('table.user_list tr').eq(0)
-            .find('td:last').get(0).innerHTML = html;
-    
-        if( this.users.length >= 2 ) {
-            $('.game_begin').show();
         }
     },
 
-    getUserNumber: function(client_id) {
-        for (var i = 0; i < this.users.length; i++) {
-            if(this.users[i].client_id == client_id) {
-                return i + 1;
-            }
+    handle_current_state: function(event) {
+        if (this.setup || event.for_client != this.client_id) return;
+        var state = $.evalJSON(event.state);
+        for (var i = 0, l = state.users.length; i < l; i++) {
+            var user = state.users[i];
+            this.addUser(user.user_id, user.client_id);
         }
-        console.log( client_id, this.users);
-        return 0;
-        //throw("Can't find client_id == " + client_id);
+        this.setup = true;
+        this.postEvent({event: 'add_user'});
+    },
+            
+
+    handle_add_user: function(event) {
+        this.addUser(event.user_id, event.client_id);
     },
 
     handle_remove_user: function(event) {
-        var ii = this.getUserNumber(event.client_id);
-        if (!ii) return;
-
-        this.users.splice(ii - 1, 1);
-
-        $('table.user_list tr')
-            .find('td:eq(' + (ii) + ')')
-            .remove();
-
-        if( this.users.length < 2 ) {
-            $('.game_begin').hide();
-        }
-
+        this.removeUser(event.client_id);
     },
 
     handle_start_game: function(event) {
