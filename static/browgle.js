@@ -17,7 +17,8 @@ function XXX() { console.log.apply(this, arguments) }
     user_id: null,
     client_id: String(Math.random()),
     state: {
-        users: []
+        users: [],
+        players: []
     },
 
     getDice: function() {
@@ -100,25 +101,6 @@ function XXX() { console.log.apply(this, arguments) }
         this.setup = true;
     },
 
-    rollDice: function() {
-        dice = this.getDice();
-        roll = [];
-        for (var i = 16; i > 0; i--) {
-            var ii = parseInt(Math.random() * i);
-            var die = dice.splice(ii, 1)[0];
-            var iii = parseInt(Math.random() * 6);
-            roll.push(die[iii]);
-        }
-        this.postEvent({
-            event: 'dice_roll',
-            'roll': $.toJSON(roll)
-        });
-    },
-
-    checkWord: function(word) {
-        return true;
-    },
-
     signOff: function() {
         window.location.reload(); 
 
@@ -151,6 +133,10 @@ function XXX() { console.log.apply(this, arguments) }
         }
     },
 
+    masterUser: function() {
+        return (this.client_id == this.state.users[0].client_id);
+    },
+
     addUser: function(user_id, client_id) {
         var self = this;
 
@@ -181,14 +167,37 @@ function XXX() { console.log.apply(this, arguments) }
                 });
             })
     
-        if (this.state.users.length >= 2) {
+        if (this.state.players.length >= 2) {
             $('.game_begin').show();
         }
     },
 
+    removeUser: function(client_id) {
+        var user = this.getUser(client_id);
+        if (!user) return;
+        var ii = user.num;
 
-    handle_add_player: function(event) {
-        var user = this.getUser(event.player_id);
+        this.state.users.splice(ii - 1, 1);
+
+        if (user.player_td) {
+            var col = $(user.player_td).prevAll('td').size();
+            $('table.user_list tr').find('td:eq(' + col + ')')
+                .remove();
+            this.state.players.splice(col - 1, 1);
+        }
+
+        $('table.people')
+            .find('tr:eq(' + (ii - 1) + ')')
+            .remove();
+
+        if( this.state.users.length < 2 ) {
+            $('.game_begin').hide();
+        }
+
+    },
+
+    addPlayer: function(player_id) {
+        var user = this.getUser(player_id);
         if (user.player_td) return;
 
         var tr = user.people_row;
@@ -199,31 +208,8 @@ function XXX() { console.log.apply(this, arguments) }
                 $(this).append('<td>' + html + '</td>');
             })
             .find('td:last')[0];
-    },
 
-    masterUser: function() {
-        return (this.client_id == this.state.users[0].client_id);
-    },
-
-
-    removeUser: function(client_id) {
-        var user = this.getUser(client_id);
-        if (!user) return;
-        var ii = user.num;
-
-        this.state.users.splice(ii - 1, 1);
-
-        $('table.user_list tr')
-            .find('td:eq(' + (ii) + ')')
-            .remove();
-        $('table.people')
-            .find('tr:eq(' + (ii - 1) + ')')
-            .remove();
-
-        if( this.state.users.length < 2 ) {
-            $('.game_begin').hide();
-        }
-
+        this.state.players.push(player_id);
     },
 
     getUser: function(client_id) {
@@ -235,6 +221,25 @@ function XXX() { console.log.apply(this, arguments) }
             }
         }
         return null;
+    },
+
+    rollDice: function() {
+        dice = this.getDice();
+        roll = [];
+        for (var i = 16; i > 0; i--) {
+            var ii = parseInt(Math.random() * i);
+            var die = dice.splice(ii, 1)[0];
+            var iii = parseInt(Math.random() * 6);
+            roll.push(die[iii]);
+        }
+        this.postEvent({
+            event: 'dice_roll',
+            'roll': $.toJSON(roll)
+        });
+    },
+
+    checkWord: function(word) {
+        return true;
     },
 
 // Server communication
@@ -284,6 +289,9 @@ function XXX() { console.log.apply(this, arguments) }
             var user = state.users[i];
             this.addUser(user.user_id, user.client_id);
         }
+        for (var i = 0, l = state.players.length; i < l; i++) {
+            this.addPlayer(state.players[i]);
+        }
         this.setup = true;
         this.postEvent({event: 'add_user'});
     },
@@ -295,6 +303,10 @@ function XXX() { console.log.apply(this, arguments) }
 
     handle_remove_user: function(event) {
         this.removeUser(event.client_id);
+    },
+
+    handle_add_player: function(event) {
+        this.addPlayer(event.player_id);
     },
 
     handle_start_game: function(event) {
