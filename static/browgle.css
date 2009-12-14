@@ -22,16 +22,33 @@ table.user_list td {
     padding: 2px 4px;
 }
 
-table.user_list td{
+table.user_list td {
     width: 50px;
 }
 
-.left_column {
+table.people {
+    width: 30px;
+}
+
+table.people td {
+    width: 30px;
+}
+
+table.people td img {
+    width: 30px;
+}
+
+.people_pane {
     float: left;
     margin-right: 50px;
 }
 
-.right_column {
+.game_pane {
+    float: left;
+    margin-right: 50px;
+}
+
+.score_pane {
     float: left;
 }
 

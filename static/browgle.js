@@ -100,25 +100,18 @@ function XXX() { console.log.apply(this, arguments) }
         this.setup = true;
     },
 
-    handle_dice_roll: function(event) {
-        var roll = event.roll;
-        var $slots = $('table.game_board td');
-        for (var i = 0, l = roll.length; i < l; i++) {
-            $slots[i].textContent = roll[i];
-        }
-    },
     rollDice: function() {
         dice = this.getDice();
-        roll = '';
+        roll = [];
         for (var i = 16; i > 0; i--) {
             var ii = parseInt(Math.random() * i);
             var die = dice.splice(ii, 1)[0];
             var iii = parseInt(Math.random() * 6);
-            roll += String(die[iii]);
+            roll.push(die[iii]);
         }
         this.postEvent({
             event: 'dice_roll',
-            'roll': roll
+            'roll': $.toJSON(roll)
         });
     },
 
@@ -159,37 +152,72 @@ function XXX() { console.log.apply(this, arguments) }
     },
 
     addUser: function(user_id, client_id) {
-        this.state.users.push({
+        var self = this;
+
+        var user = {
             user_id: user_id,
-            client_id: client_id,
-        });
+            client_id: client_id
+        };
+        this.state.users.push(user);
        
-        $('table.user_list tr')
-            .each(function() {
-                $(this).append('<td></td>');
-            });
         var url = "http://www.gravatar.com/avatar/" + $.md5(user_id);
         var html =
             '<img src="' + url +
             '" alt="' + user_id +
             '" title="' + user_id +
             '" />';
-        $('table.user_list tr').eq(0)
-            .find('td:last').get(0).innerHTML = html;
+
+        $('table.people')
+            .append('<tr><td>' + html + '</td></tr>')
+            .find('tr:last')
+            .each(function() {
+                user.people_row = this;
+                if (! self.masterUser()) return;
+                $(this).click(function() {
+                    self.postEvent({
+                        event: 'add_player',
+                        player_id: client_id
+                    });
+                });
+            })
     
         if (this.state.users.length >= 2) {
             $('.game_begin').show();
         }
     },
 
+
+    handle_add_player: function(event) {
+        var user = this.getUser(event.player_id);
+        if (user.player_td) return;
+
+        var tr = user.people_row;
+        var html = $(tr).find('td:eq(0)').html();
+
+        user.player_td = $('table.user_list tr:eq(0)')
+            .each(function() {
+                $(this).append('<td>' + html + '</td>');
+            })
+            .find('td:last')[0];
+    },
+
+    masterUser: function() {
+        return (this.client_id == this.state.users[0].client_id);
+    },
+
+
     removeUser: function(client_id) {
-        var ii = this.getUserNumber(client_id);
-        if (!ii) return;
+        var user = this.getUser(client_id);
+        if (!user) return;
+        var ii = user.num;
 
         this.state.users.splice(ii - 1, 1);
 
         $('table.user_list tr')
             .find('td:eq(' + (ii) + ')')
+            .remove();
+        $('table.people')
+            .find('tr:eq(' + (ii - 1) + ')')
             .remove();
 
         if( this.state.users.length < 2 ) {
@@ -198,13 +226,15 @@ function XXX() { console.log.apply(this, arguments) }
 
     },
 
-    getUserNumber: function(client_id) {
+    getUser: function(client_id) {
         for (var i = 0, l = this.state.users.length; i < l; i++) {
-            if (this.state.users[i].client_id == client_id) {
-                return i + 1;
+            var user = this.state.users[i];
+            if (user.client_id == client_id) {
+                user.num = i + 1;
+                return user;
             }
         }
-        return 0;
+        return null;
     },
 
 // Server communication
@@ -278,6 +308,14 @@ function XXX() { console.log.apply(this, arguments) }
             $('.word_input input').focus();
         }, 1000);
         
+    },
+
+    handle_dice_roll: function(event) {
+        var roll = $.evalJSON(event.roll);
+        var $slots = $('table.game_board td');
+        for (var i = 0, l = roll.length; i < l; i++) {
+            $slots[i].textContent = roll[i];
+        }
     },
 
     'The': 'End'
