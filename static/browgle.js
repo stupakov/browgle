@@ -166,10 +166,6 @@ function XXX() { console.log.apply(this, arguments) }
                     });
                 });
             })
-    
-        if (this.state.players.length >= 2) {
-            $('.game_begin').show();
-        }
     },
 
     removeUser: function(client_id) {
@@ -210,6 +206,10 @@ function XXX() { console.log.apply(this, arguments) }
             .find('td:last')[0];
 
         this.state.players.push(player_id);
+    
+        if (this.state.players.length >= 2) {
+            $('.game_begin').show();
+        }
     },
 
     getUser: function(client_id) {
@@ -310,16 +310,27 @@ function XXX() { console.log.apply(this, arguments) }
     },
 
     handle_start_game: function(event) {
+        var self = this;
         $('.game_begin').hide();
         $('.game_title').hide();
         $('.word_input').show();
         this.rollDice();
 
-
         setTimeout(function() {
             $('.word_input input').focus();
         }, 1000);
-        
+
+        $('.word_input')
+            .submit(function() {
+                var word = $(this).find('input').val();
+                if (! word.length) return;
+                $(this).val('');
+                self.postEvent({
+                    event: 'add_word',
+                    'word': word
+                });
+                return false;
+            })
     },
 
     handle_dice_roll: function(event) {
@@ -328,6 +339,11 @@ function XXX() { console.log.apply(this, arguments) }
         for (var i = 0, l = roll.length; i < l; i++) {
             $slots[i].textContent = roll[i];
         }
+    },
+
+    handle_add_word: function(event) {
+        var word = event.word;
+        XXX(word);
     },
 
     'The': 'End'
