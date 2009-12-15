@@ -21,10 +21,10 @@
 <body>
 <div class="canvas">
     <div class="signin_screen">
-        <h1>Browgle Sign in to play:</h1>
+        <h1>Welcome to Browgle -- Sign in to play:</h1>
         Enter your email address:
         <form name="signin" class="signin">
-            <input name="user_id" class="user_id" type="text" size="24" />
+            <input name="user_email" class="user_email" type="text" size="24" />
         </form>
         It is best to use an email address that has a <a
             href="www.gravatar.com">Gravatar</a>.
@@ -33,11 +33,13 @@
 
     <div class="game_screen">
 
-        <div class="people_pane">
-            <h1>&nbsp;</h1>
-            <table class="people">
+        <div class="users_pane">
+            <a href="#">Help</a><br/>
+
+            <table class="users">
             </table>
         </div>
+
         <div class="game_pane">
             <h1 class="game_title">Browgle</h1>
 
@@ -55,25 +57,23 @@
             <div class="game_begin">
                 <input type="submit" value="START">
             </div>
-
-            <br />
-            Testing Links:
-            <a class="roll_dice" href="#">rollDice</a>
-            <a class="sign_off" href="#">signOff</a>
         </div>
 
-        <div class="score_pane">
-            <div class="user_list_pane">
+        <div class="players_pane">
             <h1>Players</h1>
-            <table class="user_list">
-                <tr><td><b>Players:</b></td></tr>
+            <table class="players">
+                <tr></tr>
             </table>
-            </div>
         </div>
     </div>
 </div>
 
 <div class="footer">Powered by <a href="http://github.com/miyagawa/Tatsumaki">Tatsumaki</a>.</div>
+
+<br />
+Testing Links:
+<a class="roll_dice" href="#">rollDice</a>
+<a class="sign_off" href="#">signOff</a>
 
 </body>
 </html>
