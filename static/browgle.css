@@ -3,6 +3,45 @@ body {
     font-family: sans-serif;
 }
 
+.canvas {
+    min-width: 1000px;
+}
+
+.signin_error {
+    color: red;
+}
+
+.game_screen, .word_input, .game_begin {
+    display: none;
+}
+
+.users_pane {
+    float: left;
+    margin-right: 30px;
+}
+
+table.users {
+    width: 30px;
+}
+
+table.users td {
+    width: 30px;
+}
+
+table.users td img {
+    width: 30px;
+}
+
+.game_pane {
+    float: left;
+    margin-right: 50px;
+}
+
+.word_input input {
+    font-size: 200%;
+    width: 200px;
+}
+
 table.game_board {
     border-collapse:collapse;
 }
@@ -14,51 +53,22 @@ table.game_board td {
     text-align: center;
 }
 
-table.user_list {
+.players_pane {
+    float: left;
+}
+
+table.players {
     border-collapse:collapse;
 }
-table.user_list td {
-    border: solid black 1px;
-    padding: 2px 4px;
-}
 
-table.user_list td{
+table.players td {
     width: 50px;
-}
-
-.left_column {
-    float: left;
-    margin-right: 50px;
-}
-
-.right_column {
-    float: left;
+    padding: 2px 4px;
 }
 
 .footer {
     clear: both;
     width: 100%;
     text-align: center;
-    margin: 50px;
-}
-
-.signin_screen, .game_screen, .word_input, .game_begin {
-    display: none;
-}
-
-.word_input input {
-    font-size: 200%;
-    width: 200px;
-}
-
-.user_list {
-    /*float: right;*/
-}
-
-.canvas {
-    min-width: 1000px;
-}
-
-.signin_error {
-    color: red;
+    padding: 50px;
 }
