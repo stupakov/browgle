@@ -43,6 +43,24 @@ sub post {
     $self->write({ success => 1 });
 }
 
+package WordHandler;
+use base qw(Tatsumaki::Handler);
+
+sub get {
+    my ($self) = @_;
+    my $word = $self->request->param('word');
+    $word =~ s/\W//g; #get rid of non-alphanumeric characters to prevent injection attacks;
+    my $result = int( check_word($word) );
+    $self->write({ success => $result });
+    #Tatsumaki::Error::HTTP->throw(500, "$word: $result" );
+}      
+
+sub check_word {
+    my $word = uc(shift);
+    my $dict = "./dict";
+    return `grep \^$word\$ $dict` ne "";
+}
+
 package GetHandler;
 use base qw(Tatsumaki::Handler);
 
@@ -57,6 +75,7 @@ use File::Basename;
 my $app = Tatsumaki::Application->new([
     "/poll" => 'PollHandler',
     "/post" => 'PostHandler',
+    "/word" => 'WordHandler',
     "/" => 'GetHandler',
 ]);
 
