@@ -30,7 +30,8 @@ sub checkForWord {
     my @roll = @{ $_[1] };
 
     for ( my $k = 0; $k < scalar ( @roll ); $k++ ) {
-        if ( findStringAt( \@query, \@roll, $k ) ) {
+        my @path; #??
+        if ( findStringAt( \@query, \@roll, $k, \@path ) ) {
             return 1;
         }
     }
@@ -38,15 +39,18 @@ sub checkForWord {
     return 0;    
 }
 
-# function to recursively determine if a word exists in the grid, starting at a given position
+# function to recursively determine if a (sub)word exists in the grid, starting at a given position
 # params:
-#       reference to query(word) character array
-#       reference to roll(grid) character array
-#       grid index at which we wish to search for this word
+# 1     reference to query(word) character array
+# 2     reference to roll(grid) character array
+# 3     grid index at which we wish to search for this word
+# 4     reference to array containing grid indices of the path we took to get to the query
+#              - used to avoid using the same square twice.
 sub findStringAt {
     my @query = @{ $_[0] };
     my @roll = @{ $_[1] };
     my $index = $_[2];
+    my @path = @{ $_[3] };
 
     # base case of recursion - empty string means we've matched all letters
     # that must be match so the word is found
@@ -62,10 +66,14 @@ sub findStringAt {
     # see if we can find letters 2..end at any neighbor cell
     my $found = 0;
     foreach my $neighborIndex ( neighborCellIndices($index) ) {
-        my @shortenedQuery = @query[1..$#query];
-        if ( findStringAt ( \@shortenedQuery, \@roll, $neighborIndex ) ) {
-            $found = 1;
-        }               
+        if ( ! grep {$_ eq $neighborIndex} @path) {
+            my @shortenedQuery = @query[1..$#query];
+            my @hypPath=@path; #?? is this an array copy?
+            push @hypPath, $neighborIndex;
+            if ( findStringAt ( \@shortenedQuery, \@roll, $neighborIndex, \@hypPath ) ) {
+                $found = 1;
+            } 
+        }              
     }
     
     return $found;
