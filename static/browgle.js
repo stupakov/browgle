@@ -438,7 +438,11 @@ Array.prototype.grep = function(f) {
         $('.game_begin').hide();
         $('.game_title').hide();
         $('.word_input').show();
-
+        var $picture_row = $('table.players tr:first');
+        var $score_row = $('table.players').prepend("<tr></tr>").find('tr:first');
+        $picture_row.find('td').each(function() {
+            $score_row.append('<td class="total_score">0</td>');
+        });
         setTimeout(function() {
             $('.word_input input').focus();
         }, 1000);
@@ -473,6 +477,7 @@ Array.prototype.grep = function(f) {
                     '</tr>';
             $table.append(html)
         }
+        var points = (({3:1, 4:1, 5:2, 6:3, 7:5})[word.length] || 11);
         try {
             $table.find('tr').find('td:eq(' + (col - 1) + ')')
                 .each(function() {
@@ -480,7 +485,7 @@ Array.prototype.grep = function(f) {
                         $(this).html(
                             '<span class="word">' + word +
                             '</span><span class="points">' + 
-                            (({3:1, 4:1, 5:2, 6:3, 7:5})[word.length] || 11) +
+                            points +
                             '</span>'
                         );
                         throw("word inserted. see ya");
@@ -488,6 +493,8 @@ Array.prototype.grep = function(f) {
                 })
         }
         catch(e) {}
+        var $total_td = $table.find('tr:first').find('td:eq(' + (col - 1) + ')');
+        $total_td.text(parseInt($total_td.text()) + points);
     },
 
     startKeyPress: function() {

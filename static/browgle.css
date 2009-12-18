@@ -74,6 +74,11 @@ span.points {
     float: right;
 }
 
+.total_score {
+    font-weight: bold;
+    text-align: center;
+}
+
 .footer {
     clear: both;
     width: 100%;
