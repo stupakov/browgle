@@ -139,6 +139,7 @@ Array.prototype.grep = function(f) {
         $('.game_begin input')
             .click(function() {
                 self.postEvent({event: 'start_game'});
+                self.rollDice();
                 return false;
             });
 
@@ -312,6 +313,7 @@ Array.prototype.grep = function(f) {
     },
 
     insertDice: function(roll) {
+        XXX('INSERT DICE!!!!!');
         var $slots = $('table.game_board td');
         for (var i = 0, l = roll.length; i < l; i++) {
             $slots[i].textContent = roll[i];
@@ -357,7 +359,7 @@ Array.prototype.grep = function(f) {
 
 // Server communication
     postEvent: function(event) {
-        // XXX('Posting event: ' + event.event);
+        XXX('Posting event: ' + event.event);
         event.client_id = this.user_id;
         event.user_id = this.user_id;
         event.user_email = this.user_email;
@@ -374,7 +376,7 @@ Array.prototype.grep = function(f) {
     startLongPoll: function() {
         var self = this;
         $.ev.handlers.event = function(event) {
-            // XXX(event['event'], event.user_id, event);
+            XXX(event['event'], event.user_id, event);
             var handler = self['handle_' + event['event']];
             if (handler) {
                 handler.call(self, event);
@@ -436,7 +438,6 @@ Array.prototype.grep = function(f) {
         $('.game_begin').hide();
         $('.game_title').hide();
         $('.word_input').show();
-        this.rollDice();
 
         setTimeout(function() {
             $('.word_input input').focus();
