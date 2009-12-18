@@ -85,9 +85,8 @@ Array.prototype.grep = function(f) {
     showSigninScreen: function() {
         var self = this;
 
-        $('input.user_email')
-            .val('')
-            .focus();
+        $('input.user_email').val('').focus();
+        $('.word_input input').val('');
 
         $('form.signin')
             .unbind('submit')
@@ -440,7 +439,7 @@ Array.prototype.grep = function(f) {
         this.rollDice();
 
         setTimeout(function() {
-            $('.word_input input').val('').focus();
+            $('.word_input input').focus();
         }, 1000);
 
         $('.word_input')
