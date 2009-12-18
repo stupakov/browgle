@@ -19,6 +19,27 @@ function XXX() {
         console.log.apply(this, arguments)
 }
 
+Array.prototype.map = function(f) {
+    var a = [];
+    for (var i = 0, l = this.length; i < l; i++) {
+        var e = f.call(this[i]);
+        if (typeof(e) != 'undefined') {
+            a.push(e);
+        }
+    }
+    return a;
+};
+
+Array.prototype.grep = function(f) {
+    var a = [];
+    for (var i = 0, l = this.length; i < l; i++) {
+        if (f.call(this[i])) {
+            a.push(this[i]);
+        }
+    }
+    return a;
+};
+
 (Browgle = function(){}).prototype = {
 
     is_setup: false,
@@ -283,6 +304,7 @@ function XXX() {
             var iii = parseInt(Math.random() * 6);
             roll.push(die[iii]);
         }
+        roll = ['A', 'B', 'C', 'D','A', 'B', 'C', 'D','A', 'B', 'C', 'D',   'A', 'B', 'C', 'D'];
         this.postEvent({
             event: 'dice_roll',
             'roll': $.toJSON(roll)
@@ -306,23 +328,32 @@ function XXX() {
 
     checkWord: function(word) {
         var roll = this.state.game.dice_roll;
-        var used = {};
-        var path = [];
+        var paths = [[]];
         var lookup = this.letter_lookup;
         var neighbors = this.neighbors;
 
         var prev = null;
-        for (var i = 0 ; i < word.length; i++) {
+        for (var i = 0, l = word.length; i < l; i++) {
             var letter = word[i];
             if (! lookup[letter]) return false;
-            var num = lookup[letter][0];
-            if (used[num]) return false;
-            if (prev && ! neighbors[num][prev]) return false;
-            path.push(num);
-            used[num] = true;
-            prev = num;
+            var nums = lookup[letter];
+            
+            // Add letter onto end of all paths
+            var paths2 = [];
+            for (var ii = 0, ll = nums.length; ii < ll; ii++) {
+                var p = function() {
+                    if (i == 0 || neighbors[this[i - 1]][nums[ii]]) {
+                        return this.concat(nums[ii]);
+                    }
+                }
+                var a = paths.map(p);
+                paths2 = paths2.concat(a);
+            }
+            XXX('paths2', paths2);
+            if (! paths2.length) return false;
+            paths = paths2;
         }
-        return path;
+        return paths[0];
     },
 
 // Server communication
@@ -467,7 +498,7 @@ function XXX() {
                 var word = $('form.word_input input').val();
                 var new_word = word + letter;
                 var path = self.checkWord(new_word);
-                XXX(path);
+                XXX('check', new_word, path);
                 if (path) {
                     $('form.word_input input').val(new_word);
                     var $cells = $('table.game_board td').css('background-color', '#FFF');
