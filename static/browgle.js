@@ -34,11 +34,31 @@ function XXX() {
         }
     },
     user_info: {},
+    letter_lookup: {},
+    neighbors: {},
 
     init: function() {
         this.startLongPoll();
         this.showSigninScreen();
         this.addEventHandlers();
+        this.setNeighbors();
+    },
+
+    setNeighbors: function() {
+        var neighbors = this.neighbors;
+        var offsets = [ [-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,1] ];
+        for (var i = 0; i < 16; i++) {
+            var row = parseInt(i / 4);
+            var col = i % 4;
+            neighbors[i] = {};
+            for (var o = 0; o < 8; o++) {
+                var nrow = row + offsets[o][0];
+                var ncol = col + offsets[o][1];
+                if (nrow >= 0 && nrow <= 4 && ncol >= 0 && ncol <= 4) {
+                    neighbors[i][nrow * 4 + ncol] = true;
+                }
+            }
+        }
     },
 
     showSigninScreen: function() {
@@ -274,28 +294,22 @@ function XXX() {
         for (var i = 0, l = roll.length; i < l; i++) {
             $slots[i].textContent = roll[i];
         }
+
+        for (var i = 0 ; i < 16; i++) {
+            var letter = roll[i];
+            if (! this.letter_lookup[letter]) {
+                this.letter_lookup[letter] = [];
+            }
+            this.letter_lookup[letter].push(i);
+        }
     },
 
     checkWord: function(word) {
         var roll = this.state.game.dice_roll;
         var used = {};
         var path = [];
-        var lookup = {};
-        for (var i = 0 ; i < 16; i++) {
-            var letter = roll[i];
-            if (! lookup[letter]) {
-                lookup[letter] = [];
-            }
-            lookup[letter].push(i);
-        }
-
-        function isNeighbor(a, b) {
-            var arow = parseInt(a / 4);
-            var acol = a % 4;
-            var brow = parseInt(b / 4);
-            var bcol = b % 4;
-            return (Math.abs(arow - brow) < 2 && Math.abs(acol - bcol) < 2 && a != b);
-        }
+        var lookup = this.letter_lookup;
+        var neighbors = this.neighbors;
 
         var prev = null;
         for (var i = 0 ; i < word.length; i++) {
@@ -303,7 +317,7 @@ function XXX() {
             if (! lookup[letter]) return false;
             var num = lookup[letter][0];
             if (used[num]) return false;
-            if (prev && ! isNeighbor(num, prev)) return false;
+            if (prev && ! neighbors[num][prev]) return false;
             path.push(num);
             used[num] = true;
             prev = num;
