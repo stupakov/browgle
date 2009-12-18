@@ -49,7 +49,7 @@ use base qw(Tatsumaki::Handler);
 sub get {
     my ($self) = @_;
     my $word = $self->request->param('word');
-    $word =~ s/\W//g; #get rid of non-alphanumeric characters to prevent injection attacks;
+    $word =~ s/(\W|_)//g; #get rid of non-alphanumeric characters to prevent injection attacks;
     my $result = int( check_word($word) );
     $self->write({ success => $result });
     #Tatsumaki::Error::HTTP->throw(500, "$word: $result" );

@@ -14,7 +14,10 @@
  * See the License file.
  */
 
-function XXX() { if (console && console.log) console.log.apply(this, arguments) }
+function XXX() {
+    if (typeof(window.console) != 'undefined')
+        console.log.apply(this, arguments)
+}
 
 (Browgle = function(){}).prototype = {
 
@@ -74,6 +77,7 @@ function XXX() { if (console && console.log) console.log.apply(this, arguments) 
         if (this.is_setup) return;
         this.addUser(this.user_id, this.user_email);
         this.is_setup = true;
+        $('.game_begin input').click();
     },
 
     signOff: function() {
@@ -119,7 +123,7 @@ function XXX() { if (console && console.log) console.log.apply(this, arguments) 
 
     genImageHtml: function(email, id) {
         return '<img src="' +
-            'http://www.gravatar.com/avatar/' + $.md5(email);
+            'http://www.gravatar.com/avatar/' + $.md5(email) +
             '" alt="' + email +
             '" title="' + email + ' - (' + id +
             ')" />';
@@ -273,7 +277,38 @@ function XXX() { if (console && console.log) console.log.apply(this, arguments) 
     },
 
     checkWord: function(word) {
-        return true;
+        var roll = this.state.game.dice_roll;
+        var used = {};
+        var path = [];
+        var lookup = {};
+        for (var i = 0 ; i < 16; i++) {
+            var letter = roll[i];
+            if (! lookup[letter]) {
+                lookup[letter] = [];
+            }
+            lookup[letter].push(i);
+        }
+
+        function isNeighbor(a, b) {
+            var arow = parseInt(a / 4);
+            var acol = a % 4;
+            var brow = parseInt(b / 4);
+            var bcol = b % 4;
+            return (Math.abs(arow - brow) < 2 && Math.abs(acol - bcol) < 2 && a != b);
+        }
+
+        var prev = null;
+        for (var i = 0 ; i < word.length; i++) {
+            var letter = word[i];
+            if (! lookup[letter]) return false;
+            var num = lookup[letter][0];
+            if (used[num]) return false;
+            if (prev && ! isNeighbor(num, prev)) return false;
+            path.push(num);
+            used[num] = true;
+            prev = num;
+        }
+        return path;
     },
 
 // Server communication
@@ -360,7 +395,7 @@ function XXX() { if (console && console.log) console.log.apply(this, arguments) 
         this.rollDice();
 
         setTimeout(function() {
-            $('.word_input input').focus();
+            $('.word_input input').val('').focus();
         }, 1000);
 
         $('.word_input')
@@ -374,6 +409,8 @@ function XXX() { if (console && console.log) console.log.apply(this, arguments) 
                 });
                 return false;
             })
+        
+        this.startKeyPress();
 
         this.state.game.is_playing = true;
     },
@@ -392,6 +429,61 @@ function XXX() { if (console && console.log) console.log.apply(this, arguments) 
         WWW = $td = $last_row.find('td:eq(' + (col - 1) + ')');
         XXX(word, user, $td);
         */
+    },
+
+    startKeyPress: function() {
+        var self = this;
+        document.onkeypress = function (e) {
+            var key;
+            if (e == null) {
+                // IE
+                key = event.keyCode
+            }
+            else {
+                // Mozilla
+                if (e.altKey || e.ctrlKey) {
+                    return true
+                }
+                key = e.charCode || e.keyCode;
+            }
+            
+            if ( ( key >= 65 && key <= 90 )  || (key >= 97 && key <= 122 ) ) {
+                if (key > 90) key -= 32;
+                var letter = String.fromCharCode( key );
+                var word = $('form.word_input input').val();
+                var new_word = word + letter;
+                var path = self.checkWord(new_word);
+                XXX(path);
+                if (path) {
+                    $('form.word_input input').val(new_word);
+                    var $cells = $('table.game_board td').css('background-color', '#FFF');
+                    for (var i = 0; i < path.length; i++) {
+                        $($cells[path[i]]).css('background-color', '#888');
+                    }
+                }
+                else {
+                    $('form.word_input input').css('background-color', 'red');
+                    setTimeout(function() {
+                        $('form.word_input input').css('background-color', 'white');
+                    }, 200);
+                }
+            }
+            else if (key == 8) {
+                var word = $('form.word_input input').val();
+                word.splice(word.length - 1, 1);
+                $('form.word_input input').val(word);
+            }
+            else if (key == 13) {
+                var word = $('form.word_input input').val();
+                sel
+
+                return false;
+            }
+            else {
+                self.goto_number = '';
+            }
+            return false;
+        };
     },
 
     'The': 'End'

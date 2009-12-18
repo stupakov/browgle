@@ -1,3 +1,4 @@
 #!/bin/sh
 
-plackup -s AnyEvent -a browgle.psgi
+# plackup -s AnyEvent -a browgle.psgi
+plackup -s +Tatsumaki::Server -a browgle.psgi
