@@ -51,7 +51,8 @@ Array.prototype.grep = function(f) {
         game: {
             is_playing: false,
             dice_roll: [],
-            words: []
+            words: [],
+            played: {}
         }
     },
     user_info: {},
@@ -454,6 +455,7 @@ Array.prototype.grep = function(f) {
 
     handle_add_word: function(event) {
         var word = event.word;
+        this.state.game.played[word] = true;
         var user = this.getUser(event.user_id);
         var col = user.player_num;
         var $table = $('table.players');
@@ -533,7 +535,7 @@ Array.prototype.grep = function(f) {
                 var word = $('form.word_input input').val();
                 $('form.word_input input').val('');
                 var $cells = $('table.game_board td').css('background-color', '#FFF');
-                if (word.length < 3) {
+                if (word.length < 3 || self.state.game.played[word]) {
                     self.flashInput();
                     return false;
                 }
