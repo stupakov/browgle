@@ -514,10 +514,7 @@ Array.prototype.grep = function(f) {
                     }
                 }
                 else {
-                    $('form.word_input input').css('background-color', 'red');
-                    setTimeout(function() {
-                        $('form.word_input input').css('background-color', 'white');
-                    }, 200);
+                    self.flashInput();
                 }
             }
             else if (key == 8) {
@@ -536,10 +533,26 @@ Array.prototype.grep = function(f) {
                 var word = $('form.word_input input').val();
                 $('form.word_input input').val('');
                 var $cells = $('table.game_board td').css('background-color', '#FFF');
-                if (! word.length) return;
-                self.postEvent({
-                    event: 'add_word',
-                    'word': word
+                if (word.length < 3) {
+                    self.flashInput();
+                    return false;
+                }
+                $.ajax({
+                    url: "/word",
+                    data: {word: word},
+                    type: 'post',
+                    dataType: 'json',
+                    success: function(r) {
+                        if (r.success) {
+                            self.postEvent({
+                                event: 'add_word',
+                                'word': word
+                            });
+                        }
+                        else {
+                            self.flashInput();
+                        }
+                    }
                 });
             }
             else {
@@ -547,6 +560,13 @@ Array.prototype.grep = function(f) {
             }
             return false;
         };
+    },
+
+    flashInput: function() {
+        $('form.word_input input').css('background-color', 'red');
+        setTimeout(function() {
+            $('form.word_input input').css('background-color', 'white');
+        }, 200);
     },
 
     'The': 'End'
