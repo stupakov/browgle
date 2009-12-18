@@ -75,7 +75,7 @@ Array.prototype.grep = function(f) {
             for (var o = 0; o < 8; o++) {
                 var nrow = row + offsets[o][0];
                 var ncol = col + offsets[o][1];
-                if (nrow >= 0 && nrow <= 4 && ncol >= 0 && ncol <= 4) {
+                if (nrow >= 0 && nrow <= 3 && ncol >= 0 && ncol <= 3) {
                     neighbors[i][nrow * 4 + ncol] = true;
                 }
             }
@@ -278,7 +278,7 @@ Array.prototype.grep = function(f) {
         return [
             ['A', 'A', 'C', 'I', 'O', 'T'],
             ['A', 'B', 'I', 'L', 'T', 'Y'],
-            ['A', 'B', 'J', 'M', 'O', 'Qu'],
+            ['A', 'B', 'J', 'M', 'O', 'Q'], //'Qu'],
             ['A', 'C', 'D', 'E', 'M', 'P'],
             ['A', 'C', 'E', 'L', 'R', 'S'],
             ['A', 'D', 'E', 'N', 'V', 'Z'],
@@ -304,7 +304,7 @@ Array.prototype.grep = function(f) {
             var iii = parseInt(Math.random() * 6);
             roll.push(die[iii]);
         }
-        roll = ['A', 'B', 'C', 'D','A', 'B', 'C', 'D','A', 'B', 'C', 'D',   'A', 'B', 'C', 'D'];
+        // roll = ['A', 'B', 'C', 'D','A', 'B', 'C', 'D','A', 'B', 'C', 'D', 'A', 'B', 'C', 'D'];
         this.postEvent({
             event: 'dice_roll',
             'roll': $.toJSON(roll)
@@ -327,38 +327,36 @@ Array.prototype.grep = function(f) {
     },
 
     checkWord: function(word) {
-        var roll = this.state.game.dice_roll;
         var paths = [[]];
         var lookup = this.letter_lookup;
         var neighbors = this.neighbors;
-
-        var prev = null;
         for (var i = 0, l = word.length; i < l; i++) {
             var letter = word[i];
             if (! lookup[letter]) return false;
             var nums = lookup[letter];
             
-            // Add letter onto end of all paths
             var paths2 = [];
             for (var ii = 0, ll = nums.length; ii < ll; ii++) {
                 var p = function() {
-                    if (i == 0 || neighbors[this[i - 1]][nums[ii]]) {
+                    if (i == 0 || (
+                        neighbors[this[i - 1]][nums[ii]] &&
+                        !(this.grep(function() { return(this == nums[ii]) }).length)
+                    )) {
                         return this.concat(nums[ii]);
                     }
                 }
                 var a = paths.map(p);
                 paths2 = paths2.concat(a);
             }
-            XXX('paths2', paths2);
-            if (! paths2.length) return false;
             paths = paths2;
+            if (! paths.length) return false;
         }
         return paths[0];
     },
 
 // Server communication
     postEvent: function(event) {
-        XXX('Posting event: ' + event.event);
+        // XXX('Posting event: ' + event.event);
         event.client_id = this.user_id;
         event.user_id = this.user_id;
         event.user_email = this.user_email;
@@ -375,7 +373,7 @@ Array.prototype.grep = function(f) {
     startLongPoll: function() {
         var self = this;
         $.ev.handlers.event = function(event) {
-            XXX(event['event'], event.user_id, event);
+            // XXX(event['event'], event.user_id, event);
             var handler = self['handle_' + event['event']];
             if (handler) {
                 handler.call(self, event);
@@ -498,7 +496,7 @@ Array.prototype.grep = function(f) {
                 var word = $('form.word_input input').val();
                 var new_word = word + letter;
                 var path = self.checkWord(new_word);
-                XXX('check', new_word, path);
+                //XXX('check', new_word, path);
                 if (path) {
                     $('form.word_input input').val(new_word);
                     var $cells = $('table.game_board td').css('background-color', '#FFF');
@@ -515,14 +513,20 @@ Array.prototype.grep = function(f) {
             }
             else if (key == 8) {
                 var word = $('form.word_input input').val();
-                word.splice(word.length - 1, 1);
+                word = word.substr(0, word.length - 1);
                 $('form.word_input input').val(word);
+                var $cells = $('table.game_board td').css('background-color', '#FFF');
+                if (word.length > 0) {
+                    var path = self.checkWord(word);
+                    for (var i = 0; i < path.length; i++) {
+                        $($cells[path[i]]).css('background-color', '#888');
+                    }
+                }
             }
             else if (key == 13) {
                 var word = $('form.word_input input').val();
-                sel
-
-                return false;
+                var word = $('form.word_input input').val('');
+                var $cells = $('table.game_board td').css('background-color', '#FFF');
             }
             else {
                 self.goto_number = '';
