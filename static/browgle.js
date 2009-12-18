@@ -313,7 +313,6 @@ Array.prototype.grep = function(f) {
     },
 
     insertDice: function(roll) {
-        XXX('INSERT DICE!!!!!');
         var $slots = $('table.game_board td');
         for (var i = 0, l = roll.length; i < l; i++) {
             $slots[i].textContent = roll[i];
@@ -443,18 +442,6 @@ Array.prototype.grep = function(f) {
             $('.word_input input').focus();
         }, 1000);
 
-        $('.word_input')
-            .submit(function() {
-                var word = $(this).find('input').val();
-                if (! word.length) return;
-                $(this).val('');
-                self.postEvent({
-                    event: 'add_word',
-                    'word': word
-                });
-                return false;
-            })
-        
         this.startKeyPress();
 
         this.state.game.is_playing = true;
@@ -467,13 +454,33 @@ Array.prototype.grep = function(f) {
 
     handle_add_word: function(event) {
         var word = event.word;
-        /*
-        var user = this.getUser(this.user_id);
+        var user = this.getUser(event.user_id);
         var col = user.player_num;
-        $last_row = $('table.players tr:last');
-        WWW = $td = $last_row.find('td:eq(' + (col - 1) + ')');
-        XXX(word, user, $td);
-        */
+        var $table = $('table.players');
+        var $last_row = $table.find('tr:last');
+        var $td = $last_row.find('td:eq(' + (col - 1) + ')');
+        if ($td.html() != "") {
+            var a = [];
+            $last_row
+                .find('td')
+                .each(function() { a.push(this) });
+            
+            var html = '<tr>' +
+                    a.map(function() {return '<td></td>'})
+                    .join('') +
+                    '</tr>';
+            $table.append(html)
+        }
+        try {
+            $table.find('tr').find('td:eq(' + (col - 1) + ')')
+                .each(function() {
+                    if ($(this).html() == "") {
+                        $(this).text(word);
+                        throw("word inserted. see ya");
+                    }
+                })
+        }
+        catch(e) {}
     },
 
     startKeyPress: function() {
@@ -527,8 +534,13 @@ Array.prototype.grep = function(f) {
             }
             else if (key == 13) {
                 var word = $('form.word_input input').val();
-                var word = $('form.word_input input').val('');
+                $('form.word_input input').val('');
                 var $cells = $('table.game_board td').css('background-color', '#FFF');
+                if (! word.length) return;
+                self.postEvent({
+                    event: 'add_word',
+                    'word': word
+                });
             }
             else {
                 self.goto_number = '';
