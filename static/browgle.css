@@ -66,6 +66,14 @@ table.players td {
     padding: 2px 4px;
 }
 
+span.word {
+    float: left;
+}
+
+span.points {
+    float: right;
+}
+
 .footer {
     clear: both;
     width: 100%;
