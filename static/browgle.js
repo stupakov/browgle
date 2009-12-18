@@ -118,7 +118,8 @@ Array.prototype.grep = function(f) {
         if (this.is_setup) return;
         this.addUser(this.user_id, this.user_email);
         this.is_setup = true;
-        $('.game_begin input').click();
+        // $('.game_begin input').click();
+        $('.game_begin').show();
     },
 
     signOff: function() {
@@ -351,6 +352,7 @@ Array.prototype.grep = function(f) {
             paths = paths2;
             if (! paths.length) return false;
         }
+        XXX(paths);
         return paths[0];
     },
 
@@ -484,7 +486,7 @@ Array.prototype.grep = function(f) {
             }
             else {
                 // Mozilla
-                if (e.altKey || e.ctrlKey) {
+                if (e.altKey || e.ctrlKey || e.metaKey) {
                     return true
                 }
                 key = e.charCode || e.keyCode;
@@ -496,7 +498,7 @@ Array.prototype.grep = function(f) {
                 var word = $('form.word_input input').val();
                 var new_word = word + letter;
                 var path = self.checkWord(new_word);
-                //XXX('check', new_word, path);
+                XXX('check', new_word, path);
                 if (path) {
                     $('form.word_input input').val(new_word);
                     var $cells = $('table.game_board td').css('background-color', '#FFF');
