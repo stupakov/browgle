@@ -15,7 +15,7 @@ body {
     display: none;
 }
 
-.users_pane {
+.users_pane, .chat_pane, .game_pane, .players_pane {
     float: left;
     margin-right: 30px;
 }
@@ -29,18 +29,28 @@ table.users td {
 }
 
 table.users td img {
-    width: 30px;
+    width: 40px;
 }
 
-.game_pane {
-    float: left;
-    margin-right: 50px;
+.chat_messages {
+    width: 250px;
+    border: 1px solid black;
+    overflow: auto;
+}
+
+span.msg img {
+    width: 25px;
+}
+
+.chat_input input {
+    width: 250px;
 }
 
 .word_input input {
     font-size: 200%;
     width: 200px;
 }
+
 
 table.game_board {
     border-collapse:collapse;

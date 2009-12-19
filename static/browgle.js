@@ -88,6 +88,7 @@ Array.prototype.grep = function(f) {
 
         $('input.user_email').val('').focus();
         $('.word_input input').val('');
+        $('.chat_input input').val('');
 
         $('form.signin')
             .unbind('submit')
@@ -98,6 +99,7 @@ Array.prototype.grep = function(f) {
                         self.user_email = email;
                         self.postEvent({event: 'request_state'});
                         $('.signin_screen').hide();
+                        $('.chat_messages').height(500);
                         $('table.game_board td')
                             .height(50)
                             .width(50);
@@ -136,6 +138,19 @@ Array.prototype.grep = function(f) {
 
     addEventHandlers: function() {
         var self = this;
+
+        $('.chat_input')
+            .submit(function() {
+                try {
+                var msg = $(this).find('input').val();
+                $(this).find('input').val('').focus();
+                self.postEvent({
+                    event: 'chat_msg',
+                    msg: msg
+                });
+                }catch(e) {console.log('ERROR:', e)}
+                return false;
+            });
 
         $('.game_begin input')
             .click(function() {
@@ -416,6 +431,15 @@ Array.prototype.grep = function(f) {
     },
             
 
+    handle_chat_msg: function(event) {
+        var user = this.getUser(event.user_id); 
+        var email = user.user_email;
+        var id = user.user_id;
+        var html = '<span class="msg">' + this.genImageHtml(email, id) + '&nbsp;' +
+            event.msg + '</span><br />';
+        $('.chat_messages').prepend(html);
+    },
+
     handle_add_user: function(event) {
         this.addUser(event.user_id, event.user_email);
     },
@@ -437,6 +461,7 @@ Array.prototype.grep = function(f) {
         var self = this;
         $('.game_begin').hide();
         $('.game_title').hide();
+        $('.chat_input').hide();
         $('.word_input').show();
         var $picture_row = $('table.players tr:first');
         var $score_row = $('table.players').prepend("<tr></tr>").find('tr:first');
