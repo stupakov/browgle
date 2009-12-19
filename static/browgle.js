@@ -104,6 +104,7 @@ Array.prototype.grep = function(f) {
                             .height(50)
                             .width(50);
                         $('.game_screen').show();
+                        setTimeout(function() { $('.chat_input input').focus() }, 250);
                         setTimeout(function() { self.setupFirstUser() }, 1000);
                     }
                     else {
@@ -114,6 +115,10 @@ Array.prototype.grep = function(f) {
                     return false;
                 }
             );
+        if (window.location.search.match(/email=(.*)/)) {
+            var email = RegExp.$1;
+            $('form.signin').find('input').val(email).end().submit();
+        }
     },
 
     setupFirstUser: function() {
