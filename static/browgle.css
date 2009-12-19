@@ -38,7 +38,7 @@ table.users td img {
     overflow: auto;
 }
 
-span.msg img {
+.chat_messages img {
     vertical-align: middle;
     width: 25px;
     border: 1px solid white;

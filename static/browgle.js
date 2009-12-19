@@ -7,7 +7,7 @@
  */
 
 function XXX() {
-    throw("Don't do XXX");
+    throw("Don't checkin code with XXX!");
     if (typeof(window.console) != 'undefined')
         console.log.apply(this, arguments)
 }
@@ -143,12 +143,17 @@ Array.prototype.grep = function(f) {
                     $('.chat_messages').html('');
                 }
                 else if (msg.match(/\S/)) {
-                    $(this).find('input').val('').focus();
+                    msg = msg.replace(/^\s+/, '')
+                        .replace(/\s+$/, '')
+                        .replace(/\s+/g, ' ')
+                    if (msg.length > 150)
+                        msg = msg.substr(0, 150);
                     self.postEvent({
                         event: 'chat_msg',
                         msg: msg
                     });
                 }
+                $(this).find('input').val('').focus();
                 return false;
             });
 
@@ -438,9 +443,12 @@ Array.prototype.grep = function(f) {
         var user = this.getUser(event.user_id); 
         var email = user.user_email;
         var id = user.user_id;
-        var html = '<span class="msg">' + this.genImageHtml(email, id) + '&nbsp;' +
-            event.msg + '</span><br />';
-        $('.chat_messages').prepend(html);
+        var html = this.genImageHtml(email, id) +
+            '&nbsp;<span class="msg"></span><br />';
+        $('.chat_messages')
+            .prepend(html)
+            .find('span:first')
+            .text(event.msg);
     },
 
     handle_add_user: function(event) {
