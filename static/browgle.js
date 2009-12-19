@@ -1,11 +1,3 @@
-/* To Do:
- *
- * Add word to list
- * Capture keystrokes for user input
- * Write a wordchecker function
- *
- */
-
 /*
  * Browgle - A browser-based, multi-user B*ggle game.
  * 
@@ -15,6 +7,7 @@
  */
 
 function XXX() {
+    throw("Don't do XXX");
     if (typeof(window.console) != 'undefined')
         console.log.apply(this, arguments)
 }
@@ -126,8 +119,6 @@ Array.prototype.grep = function(f) {
         if (this.is_setup) return;
         this.addUser(this.user_id, this.user_email);
         this.is_setup = true;
-        // $('.game_start input').click();
-        // $('.game_start').show();
     },
 
     signOff: function() {
@@ -147,14 +138,17 @@ Array.prototype.grep = function(f) {
 
         $('.chat_input')
             .submit(function() {
-                try {
                 var msg = $(this).find('input').val();
-                $(this).find('input').val('').focus();
-                self.postEvent({
-                    event: 'chat_msg',
-                    msg: msg
-                });
-                }catch(e) {console.log('ERROR:', e)}
+                if (msg == '   ') {
+                    $('.chat_messages').html('');
+                }
+                else if (msg.match(/\S/)) {
+                    $(this).find('input').val('').focus();
+                    self.postEvent({
+                        event: 'chat_msg',
+                        msg: msg
+                    });
+                }
                 return false;
             });
 
@@ -162,6 +156,12 @@ Array.prototype.grep = function(f) {
             .click(function() {
                 self.postEvent({event: 'start_game'});
                 self.rollDice();
+                return false;
+            });
+
+        $('.game_stop input')
+            .click(function() {
+                self.postEvent({event: 'stop_game'});
                 return false;
             });
 
@@ -257,7 +257,7 @@ Array.prototype.grep = function(f) {
 
         this.state.players.push(player_id);
     
-        if (this.state.players.length >= 2) {
+        if (this.isMasterUser() && this.state.players.length >= 2) {
             $('.game_start').show();
         }
     },
@@ -298,7 +298,7 @@ Array.prototype.grep = function(f) {
         return [
             ['A', 'A', 'C', 'I', 'O', 'T'],
             ['A', 'B', 'I', 'L', 'T', 'Y'],
-            ['A', 'B', 'J', 'M', 'O', 'Q'], //'Qu'],
+            ['A', 'B', 'J', 'M', 'O', 'Y'], //'Qu'],
             ['A', 'C', 'D', 'E', 'M', 'P'],
             ['A', 'C', 'E', 'L', 'R', 'S'],
             ['A', 'D', 'E', 'N', 'V', 'Z'],
@@ -461,13 +461,16 @@ Array.prototype.grep = function(f) {
     },
 
     handle_start_game: function(event) {
-        var self = this;
         $('.game_start').hide();
-        $('.game_stop').show();
-        $('.game_title').hide();
+        if (this.isMasterUser())
+            $('.game_stop').show();
         $('.word_input').show();
+        $('tr.score_row').remove();
+        $('table.players tr:gt(0)').remove();
         var $picture_row = $('table.players tr:first');
-        var $score_row = $('table.players').prepend("<tr></tr>").find('tr:first');
+        var $score_row = $('table.players')
+            .prepend('<tr class="score_row"></tr>')
+            .find('tr:first');
         $picture_row.find('td').each(function() {
             $score_row.append('<td class="total_score">0</td>');
         });
@@ -478,6 +481,17 @@ Array.prototype.grep = function(f) {
         this.startKeyPress();
 
         this.state.game.is_playing = true;
+    },
+
+    handle_stop_game: function(event) {
+        this.state.game.is_playing = false;
+        this.stopKeyPress();
+        this.letter_lookup = {};
+
+        if (this.isMasterUser())
+            $('.game_start').show();
+        $('.game_stop').hide();
+        $('.word_input').hide();
     },
 
     handle_dice_roll: function(event) {
@@ -603,6 +617,10 @@ Array.prototype.grep = function(f) {
             }
             return false;
         };
+    },
+
+    stopKeyPress: function() {
+        document.onkeypress = function(e) { return true };
     },
 
     flashInput: function() {

@@ -8,15 +8,19 @@
 + Keep users in the object
 + Add Start button if users is >= 2
 + Support chat during game
++ Add a END GAME button
 
-- Set up a JS testing environment
+- Refactor browgle.js to put methods in better order.
 - Add proper support for 'Qu'
 - Add a game timer
+- Add a index of all current game rooms
 - Let Master set game options/rules
-- Add a QuitGame button
 - Picture borders could be used to indicate user role
 - Switch over to MXHR long-poll model
 - Limit chat msgs to 150 chars.
+- HTML encode chat msgs
+- Support light wiki markup in chat msgs
 - Easter egg to clear chat messages
 - Set colored backgrounds
+- Set up a JS testing environment
 

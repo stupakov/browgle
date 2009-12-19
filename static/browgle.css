@@ -74,15 +74,17 @@ table.players {
 
 table.players td {
     width: 50px;
-    padding: 2px 4px;
+    padding: 1px 3px 0px 3px;
 }
 
 span.word {
     float: left;
+    font-size: 60%;
 }
 
 span.points {
     float: right;
+    font-size: 60%;
 }
 
 .total_score {
