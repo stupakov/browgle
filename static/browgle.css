@@ -11,7 +11,7 @@ body {
     color: red;
 }
 
-.game_screen, .word_input, .game_begin {
+.game_screen, .word_input, .game_start, .game_stop {
     display: none;
 }
 
@@ -34,12 +34,14 @@ table.users td img {
 
 .chat_messages {
     width: 250px;
-    border: 1px solid black;
+    background-color: #ffe;
     overflow: auto;
 }
 
 span.msg img {
+    vertical-align: middle;
     width: 25px;
+    border: 1px solid white;
 }
 
 .chat_input input {
@@ -50,7 +52,6 @@ span.msg img {
     font-size: 200%;
     width: 200px;
 }
-
 
 table.game_board {
     border-collapse:collapse;
@@ -93,5 +94,5 @@ span.points {
     clear: both;
     width: 100%;
     text-align: center;
-    padding: 50px;
+    padding-top: 20px;
 }

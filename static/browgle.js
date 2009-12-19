@@ -58,6 +58,7 @@ Array.prototype.grep = function(f) {
     user_info: {},
     letter_lookup: {},
     neighbors: {},
+    chat_focus: false,
 
     init: function() {
         this.startLongPoll();
@@ -125,8 +126,8 @@ Array.prototype.grep = function(f) {
         if (this.is_setup) return;
         this.addUser(this.user_id, this.user_email);
         this.is_setup = true;
-        // $('.game_begin input').click();
-        $('.game_begin').show();
+        // $('.game_start input').click();
+        // $('.game_start').show();
     },
 
     signOff: function() {
@@ -157,21 +158,18 @@ Array.prototype.grep = function(f) {
                 return false;
             });
 
-        $('.game_begin input')
+        $('.game_start input')
             .click(function() {
                 self.postEvent({event: 'start_game'});
                 self.rollDice();
                 return false;
             });
 
-        $('.roll_dice').click(function() {
-            self.rollDice();
-            return false;
-        });
-
-        $('.sign_off').click(function() {
-            self.signOff();
-            return false;
+        $('.chat_input input').blur(function() {
+            self.chat_focus = false;
+        })
+        .focus(function() {
+            self.chat_focus = true;
         });
 
         onunload = function() {
@@ -260,7 +258,7 @@ Array.prototype.grep = function(f) {
         this.state.players.push(player_id);
     
         if (this.state.players.length >= 2) {
-            $('.game_begin').show();
+            $('.game_start').show();
         }
     },
 
@@ -276,7 +274,7 @@ Array.prototype.grep = function(f) {
         delete this.user_info[user_id].player_td;
 
         if( this.state.players.length < 2 ) {
-            $('.game_begin').hide();
+            $('.game_start').hide();
         }
     },
 
@@ -464,9 +462,9 @@ Array.prototype.grep = function(f) {
 
     handle_start_game: function(event) {
         var self = this;
-        $('.game_begin').hide();
+        $('.game_start').hide();
+        $('.game_stop').show();
         $('.game_title').hide();
-        $('.chat_input').hide();
         $('.word_input').show();
         var $picture_row = $('table.players tr:first');
         var $score_row = $('table.players').prepend("<tr></tr>").find('tr:first');
@@ -530,6 +528,7 @@ Array.prototype.grep = function(f) {
     startKeyPress: function() {
         var self = this;
         document.onkeypress = function (e) {
+            if (self.chat_focus) return true;
             var key;
             if (e == null) {
                 // IE

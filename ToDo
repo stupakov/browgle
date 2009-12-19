@@ -7,6 +7,7 @@
 + Add appropriate COPYRIGHT statements
 + Keep users in the object
 + Add Start button if users is >= 2
++ Support chat during game
 
 - Set up a JS testing environment
 - Add proper support for 'Qu'
@@ -15,5 +16,7 @@
 - Add a QuitGame button
 - Picture borders could be used to indicate user role
 - Switch over to MXHR long-poll model
-- Support chat during game
-- 
+- Limit chat msgs to 150 chars.
+- Easter egg to clear chat messages
+- Set colored backgrounds
+
