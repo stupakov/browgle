@@ -482,6 +482,7 @@ Array.prototype.grep = function(f) {
         $picture_row.find('td').each(function() {
             $score_row.append('<td class="total_score">0</td>');
         });
+        this.chat_focus = false;
         setTimeout(function() {
             $('.word_input input').focus();
         }, 1000);
