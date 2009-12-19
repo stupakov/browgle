@@ -16,7 +16,8 @@ dict: TWL06.txt
 
 TWL06.txt: twl06.zip
 	unzip $<
-	touch $@
+	perl -pi -e 's/\r//' $@
+	rm $<
 
 twl06.zip:
 	wget 'http://www.isc.ro/lists/twl06.zip'
