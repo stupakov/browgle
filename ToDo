@@ -4,7 +4,16 @@
 + Handle events coming back from server
 + Get rid of cookies. Always get new userid for new session.
 + Put gravatar in the user list
++ Add appropriate COPYRIGHT statements
++ Keep users in the object
++ Add Start button if users is >= 2
 
-- Add appropriate COPYRIGHT statements
-- Keep users in the object
-- Add Start button if users is >= 2
+- Set up a JS testing environment
+- Add proper support for 'Qu'
+- Add a game timer
+- Let Master set game options/rules
+- Add a QuitGame button
+- Picture borders could be used to indicate user role
+- Switch over to MXHR long-poll model
+- Support chat during game
+- 
