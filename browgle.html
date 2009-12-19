@@ -1,21 +1,23 @@
+% my $room = $_[0]->{handler}->args->[0];
 <html>
 <head>
 <title>Browgle</title>
 
-<script src="static/jquery.js"></script>
-<script src="static/jquery.ev.js"></script>
-<script src="static/jquery.md5.js"></script>
-<script src="static/jquery.json.js"></script>
-<script src="static/browgle.js"></script>
+<script src="/static/jquery.js"></script>
+<script src="/static/jquery.ev.js"></script>
+<script src="/static/jquery.md5.js"></script>
+<script src="/static/jquery.json.js"></script>
+<script src="/static/browgle.js"></script>
 <script>
     jQuery(function(){
         var browgle = new Browgle();
-        QQQ = browgle;
+        browgle.room = "<%= $room %>";
+        B = browgle;
         browgle.init();
     });
 </script>
 
-<link rel="stylesheet" href="static/browgle.css" />
+<link rel="stylesheet" href="/static/browgle.css" />
 </head>
 
 <body>

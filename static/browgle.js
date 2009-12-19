@@ -359,13 +359,13 @@ Array.prototype.grep = function(f) {
 
 // Server communication
     postEvent: function(event) {
-        XXX('Posting event: ' + event.event);
+        // XXX('Posting event: ' + event.event);
         event.client_id = this.user_id;
         event.user_id = this.user_id;
         event.user_email = this.user_email;
         event.type = 'event';
         $.ajax({
-            url: "/post",
+            url: '/games/' + this.room + '/post',
             data: event,
             type: 'post',
             dataType: 'json',
@@ -376,13 +376,13 @@ Array.prototype.grep = function(f) {
     startLongPoll: function() {
         var self = this;
         $.ev.handlers.event = function(event) {
-            XXX(event['event'], event.user_id, event);
+            // XXX(event['event'], event.user_id, event);
             var handler = self['handle_' + event['event']];
             if (handler) {
                 handler.call(self, event);
             }
         };
-        $.ev.loop('/poll?client_id=' + this.user_id);
+        $.ev.loop('/games/' + this.room + '/poll?client_id=' + this.user_id);
     },
 
 // Message handlers
@@ -552,7 +552,7 @@ Array.prototype.grep = function(f) {
                     return false;
                 }
                 $.ajax({
-                    url: "/word",
+                    url: "/word_lookup",
                     data: {word: word},
                     type: 'post',
                     dataType: 'json',
