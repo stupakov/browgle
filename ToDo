@@ -13,7 +13,12 @@
 + Easter egg to clear chat messages
 + Limit chat msgs to 150 chars.
 + HTML encode chat msgs
++ Fix key capture in Safari
 
+== Bugs
+
+== Features
+- Blink yellow if word already used
 - Support light wiki markup in chat msgs
 - Refactor browgle.js to put methods in better order.
 - Add proper support for 'Qu'
